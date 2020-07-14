@@ -8,12 +8,12 @@ pub struct KvStore {
 
 impl KvStore {
     /// This method used to create a KvStore
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use kvs::KvStore;
-    /// 
+    ///
     /// let mut _kvstore = KvStore::new();
     /// ```
     pub fn new() -> KvStore {
@@ -24,12 +24,12 @@ impl KvStore {
 
     /// This method used to set a new key-value pair,
     /// It can also be used to update the value of a key
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use kvs::KvStore;
-    /// 
+    ///
     /// let mut kvstore = KvStore::new();
     /// kvstore.set("key01".to_owned(), "value01".to_owned());
     /// assert_eq!(kvstore.get("key01".to_owned()), Some("value01".to_owned()));
@@ -42,12 +42,12 @@ impl KvStore {
 
     /// This method used to get a value of the key in the Option.
     /// Key not been set will return None
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use kvs::KvStore;
-    /// 
+    ///
     /// let mut kvstore = KvStore::new();
     /// kvstore.set("key01".to_owned(), "value01".to_owned());
     /// assert_eq!(kvstore.get("key01".to_owned()), Some("value01".to_owned()));
@@ -58,12 +58,12 @@ impl KvStore {
     }
 
     /// This method used to remove a key-value pair.alloc
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use kvs::KvStore;
-    /// 
+    ///
     /// let mut kvstore = KvStore::new();
     /// kvstore.set("key01".to_owned(), "value01".to_owned());
     /// assert_eq!(kvstore.get("key01".to_owned()), Some("value01".to_owned()));
