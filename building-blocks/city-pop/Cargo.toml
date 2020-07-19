@@ -1,0 +1,15 @@
+[package]
+name = "city-pop"
+version = "0.1.0"
+authors = ["lsy <aresli96@outlook.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+csv = "0.14"
+docopt = "0.6"
+rustc-serialize = "0.3"
+
+[[bin]]
+name = "city-pop"

@@ -1,0 +1,10 @@
+/mnt/c/Users/AresL/Desktop/PNA-Rust/project-2/target/rls/debug/deps/rand_core-674612930bf600c8.rmeta: /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/lib.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/error.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/block.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/impls.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/le.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/os.rs
+
+/mnt/c/Users/AresL/Desktop/PNA-Rust/project-2/target/rls/debug/deps/rand_core-674612930bf600c8.d: /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/lib.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/error.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/block.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/impls.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/le.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/os.rs
+
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/lib.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/error.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/block.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/impls.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/le.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/rand_core-0.5.1/src/os.rs:

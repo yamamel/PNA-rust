@@ -1,0 +1,11 @@
+/mnt/c/Users/AresL/Desktop/PNA-Rust/project-2/target/rls/debug/deps/memchr-31a967378706ab7b.rmeta: /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/lib.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/fallback.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/iter.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/naive.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/mod.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/avx.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/sse2.rs
+
+/mnt/c/Users/AresL/Desktop/PNA-Rust/project-2/target/rls/debug/deps/memchr-31a967378706ab7b.d: /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/lib.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/fallback.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/iter.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/naive.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/mod.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/avx.rs /home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/sse2.rs
+
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/lib.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/fallback.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/iter.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/naive.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/mod.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/avx.rs:
+/home/lsy/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/memchr-2.3.3/src/x86/sse2.rs:
