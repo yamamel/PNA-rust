@@ -55,6 +55,7 @@ impl KvStore {
         let mut f = self.buffer.get_ref();
         serde_json::to_writer(f, &self.command)?;
         // let mut f = OpenOptions::new().write(true).append(true).create(true).open("kvs-value.json")?;
+        // Question: using `%` to separate commands can not pass the get_stored_key test
         f.write(b"\n")?;
         self.uncompacted_size += len;
         if self.uncompacted_size > MAX_UNCOMPACTED_SIZE {
@@ -162,7 +163,7 @@ impl KvStore {
             let mut cmd = reader.take(*length);
             std::io::copy(&mut cmd, &mut f)?;
             *offset = new_offset;
-            // I still don't know why the compact test will add the split of mine twice.
+            // Question: I still don't know why the compact test will add the split of mine twice.
             // f.write(b"\n")?;
             // new_offset += *length + "\n".len() as u64;
             new_offset += *length;
