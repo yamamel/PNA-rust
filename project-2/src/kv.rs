@@ -17,7 +17,8 @@ enum Command {
     Get { key: String },
 }
 
-/// the `KvStore` using a hashmap to store value in the memory
+/// the `KvStore` using a hashmap to store log in the memory
+/// log is presented by a position in the file and the length of it
 pub struct KvStore {
     map: HashMap<String, LogInFile>,
     command: Option<Command>,
@@ -28,8 +29,7 @@ pub struct KvStore {
 }
 
 impl KvStore {
-    /// This method used to create a KvStore
-    pub fn new(buffer: BufReader<std::fs::File>, path: PathBuf) -> KvStore {
+    fn new(buffer: BufReader<std::fs::File>, path: PathBuf) -> KvStore {
         KvStore {
             map: HashMap::new(),
             command: None,
@@ -42,6 +42,7 @@ impl KvStore {
 
     /// This method used to set a new key-value pair,
     /// It can also be used to update the value of a key
+    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
     pub fn set(&mut self, key: String, value: String) -> Result<()> {
         // self.map.insert(key, value)
         // unimplemented!();
@@ -65,7 +66,8 @@ impl KvStore {
     }
 
     /// This method used to get a value of the key in the Option.
-    /// Key not been set will return None
+    /// Key not been set will return `Ok(None)`
+    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
     pub fn get(&mut self, key: String) -> Result<Option<String>> {
         // self.map.get(&key).cloned()
         // unimplemented!();
@@ -84,7 +86,9 @@ impl KvStore {
         }
     }
 
-    /// This method used to remove a key-value pair.alloc
+    /// This method used to remove a key-value pair
+    /// if the given key is not exist, a `KvsError::KeyNotFoundError` will be returned
+    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
     pub fn remove(&mut self, key: String) -> Result<()> {
         // self.map.remove(&key);
         // unimplemented!();
@@ -109,6 +113,9 @@ impl KvStore {
         Ok(())
     }
 
+    /// This method is used to create a KvStore
+    /// It will read the "kvs-data.json" file in the path
+    /// initiate the key-log record in the memory.
     pub fn open(path: impl Into<PathBuf>) -> Result<KvStore> {
         let mut path: PathBuf = path.into();
         let path_clone = path.clone();
@@ -145,7 +152,9 @@ impl KvStore {
         }
         Ok(kvstore)
     }
-
+    /// this method is used to compact the log file
+    /// it will be automatically used by `rm` and `set` when uncompacted data size
+    /// exceed a fixed size
     pub fn compact(&mut self) -> Result<()> {
         let mut path_from = self.path.clone();
         let mut path_to = self.path.clone();
