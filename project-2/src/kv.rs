@@ -44,8 +44,6 @@ impl KvStore {
     /// It can also be used to update the value of a key
     /// An `KvsError::IoError` or `KvsError::SerdeError` may return
     pub fn set(&mut self, key: String, value: String) -> Result<()> {
-        // self.map.insert(key, value)
-        // unimplemented!();
         let key_clone = key.clone();
         self.command = Some(Command::Set { key, value });
         let j = serde_json::to_string(&self.command)?;
@@ -55,7 +53,6 @@ impl KvStore {
         self.position += len;
         let mut f = self.buffer.get_ref();
         serde_json::to_writer(f, &self.command)?;
-        // let mut f = OpenOptions::new().write(true).append(true).create(true).open("kvs-value.json")?;
         // Question: using `%` to separate commands can not pass the get_stored_key test
         f.write(b"\n")?;
         self.uncompacted_size += len;
@@ -69,8 +66,6 @@ impl KvStore {
     /// Key not been set will return `Ok(None)`
     /// An `KvsError::IoError` or `KvsError::SerdeError` may return
     pub fn get(&mut self, key: String) -> Result<Option<String>> {
-        // self.map.get(&key).cloned()
-        // unimplemented!();
         match self.map.get(&key) {
             None => Ok(None),
             Some(log) => {
@@ -90,12 +85,9 @@ impl KvStore {
     /// if the given key is not exist, a `KvsError::KeyNotFoundError` will be returned
     /// An `KvsError::IoError` or `KvsError::SerdeError` may return
     pub fn remove(&mut self, key: String) -> Result<()> {
-        // self.map.remove(&key);
-        // unimplemented!();
         match self.map.get(&key) {
             None => return Err(KvsError::KeyNotFoundError),
             Some(_) => {
-                // println!("{}", value);
                 self.map.remove(&key);
                 self.command = Some(Command::Rm { key });
                 let j = serde_json::to_string(&self.command)?;
@@ -130,7 +122,6 @@ impl KvStore {
         let mut str_buffer = String::new();
         let mut kvstore = KvStore::new(buffer, path_clone);
         kvstore.buffer.read_to_string(&mut str_buffer)?;
-        // println!("{}", buffer);
         for s in str_buffer.split("\n").collect::<Vec<&str>>() {
             if s.len() == 0 {
                 continue;
@@ -194,3 +185,12 @@ impl LogInFile {
         LogInFile { offset, length }
     }
 }
+
+// In the author's code. The logs are in different files.
+// every time he open a kvstore, a new log file was build, and the next log file index
+// is found while scanning existing log file in the directory.
+// While opening, besides store the key-[log position] pair, he also store a key-reader pair
+// cause keys may not in the same log file.
+
+// As same as the `compact` function as mine, he just scans the index-[log pos] map
+// and copy the exist log to a new file (Though the file name is 1+largest index of log file now). 
