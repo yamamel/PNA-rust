@@ -1,0 +1,38 @@
+[package]
+name = "kvs"
+version = "0.1.0"
+authors = ["lsy"]
+description = "A key-value store"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+assert_cmd = "1.0.1"
+criterion = "0.3.3"
+rand = "0.7.3"
+predicates = "1.0.4"
+tempfile = "3.0.7"
+walkdir = "2.2.7"
+clap = "2.33.1"
+failure = "0.1.8"
+failure_derive = "0.1.8"
+serde = { version = "1.0.114", features = ["derive"] }
+serde_json = "1.0"
+sloggers = "1.0.1"
+slog = "2.5.2"
+
+[[bin]]
+name = "kvs-server"
+test = false
+path = "src/bin/kvs-server.rs"
+
+[[bin]]
+name = "kvs-client"
+test = false
+path = "src/bin/kvs-client.rs"
+
+[lib]
+name = "kvs"
+test = false
+doctest = true
