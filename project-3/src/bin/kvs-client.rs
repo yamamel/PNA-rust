@@ -1,10 +1,11 @@
 use clap::{App, Arg};
-use kvs::KvStore;
+use kvs::{KvStore, Command};
 use kvs::{KvsError, Result};
 use std::process::exit;
 use std::env::current_dir;
 use std::net::TcpStream;
-use std::io::Write;
+use std::io::{Write, Read};
+use serde_json;
 
 fn main() -> Result<()> {
     let matches = App::new("kvs-client")
@@ -53,15 +54,18 @@ fn main() -> Result<()> {
 
     match matches.subcommand() {
         ("set", Some(matches)) => {
-            let _key = matches.value_of("KEY").expect("KEY is missing");
-            let _value = matches.value_of("VALUE").expect("VALUE is missing");
+            let key = matches.value_of("KEY").expect("KEY is missing");
+            let value = matches.value_of("VALUE").expect("VALUE is missing");
             // let mut kvstore = KvStore::open(current_dir()?)?;
             // kvstore.set(key.to_owned(), value.to_owned());
-            stream.write(b"set")?;
+            let cmd = Command::Set { key: key.to_owned(), value: value.to_owned() };
+            let cmd = serde_json::to_string(&cmd)?;
+            stream.write(cmd.as_bytes())?;
+            stream.flush()?;
             Ok(())
         }
         ("get", Some(matches)) => {
-            let _key = matches.value_of("KEY").expect("KEY is missing");
+            let key = matches.value_of("KEY").expect("KEY is missing");
             // let mut kvstore = KvStore::open(current_dir()?)?;
             // match kvstore.get(key.to_owned())? {
             //     None => {
@@ -73,11 +77,17 @@ fn main() -> Result<()> {
             //         Ok(())
             //     }
             // }
-            stream.write(b"get")?;
+            let cmd = Command::Get { key: key.to_owned() };
+            let cmd = serde_json::to_string(&cmd)?;
+            stream.write(cmd.as_bytes())?;
+            stream.flush()?;
+            let mut response = String::new();
+            stream.read_to_string(&mut response)?;
+            println!("{}", response);
             Ok(())
         }
         ("rm", Some(matches)) => {
-            let _key = matches.value_of("KEY").expect("KEY is missing");
+            let key = matches.value_of("KEY").expect("KEY is missing");
             // let mut kvstore = KvStore::open(current_dir()?)?;
             // match kvstore.remove(key.to_owned()) {
             //     Ok(()) => Ok(()),
@@ -87,7 +97,15 @@ fn main() -> Result<()> {
             //     }
             //     Err(e) => Err(e),
             // }
-            stream.write(b"rm")?;
+            let cmd = Command::Rm { key: key.to_owned() };
+            let cmd = serde_json::to_string(&cmd)?;
+            stream.write(cmd.as_bytes())?;
+            stream.flush()?;
+            let mut response = String::new();
+            stream.read_to_string(&mut response)?;
+            if response.len() > 0 {
+                println!("{}", response);
+            }
             Ok(())
         }
         _ => {

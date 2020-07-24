@@ -11,7 +11,7 @@ use std::path::PathBuf;
 const MAX_UNCOMPACTED_SIZE: u64 = 1024 * 1024;
 
 #[derive(Debug, Deserialize, Serialize)]
-enum Command {
+pub enum Command {
     Set { key: String, value: String },
     Rm { key: String },
     Get { key: String },
