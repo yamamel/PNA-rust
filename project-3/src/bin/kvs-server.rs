@@ -1,3 +1,4 @@
+use clap::arg_enum;
 use structopt::StructOpt;
 use slog::info;
 use sloggers::Build;
@@ -9,10 +10,18 @@ use std::io::{Read, Write, BufReader, BufWriter};
 use std::env::current_dir;
 use kvs::SledStore;
 
-#[derive(Debug, StructOpt)]
+arg_enum! {
+    #[derive(Debug, Clone)]
+    enum Engine {
+        Kvs,
+        Sled,
+    }
+}
+
+#[derive(Debug, StructOpt, Clone)]
 struct ServerOpt {
-    #[structopt(long, default_value = "kvs")]
-    engine: String,
+    #[structopt(long, possible_values = &Engine::variants(), case_insensitive = true)]
+    engine: Option<Engine>,
 
     #[structopt(long, default_value = "127.0.0.1:4000")]
     addr: String,
@@ -20,23 +29,48 @@ struct ServerOpt {
 
 fn main() -> Result<()> {
     let opt = ServerOpt::from_args();
-    if opt.engine != "kvs".to_owned() && opt.engine != "sled".to_owned() {
-        return Err(KvsError::WrongEngineError { engine: opt.engine, });
+
+    let engine = opt.clone().engine.unwrap_or(Engine::Kvs);
+
+    let paths = std::fs::read_dir(current_dir()?).unwrap();
+
+    let mut sled_exist: Option<String> = None;
+
+    let mut kvs_exist: Option<String> = None;
+
+    for entry in paths {
+        let file_name = entry.unwrap().path().file_name().unwrap().to_string_lossy().into_owned();
+        if file_name.starts_with("kvs") {
+            kvs_exist = Some(file_name);
+            break;
+        } else if file_name.starts_with("sled") {
+            sled_exist = Some(file_name);
+            break;
+        }
     }
 
-    let mut paths = std::fs::read_dir(current_dir()?).unwrap();
+    // let sled_exist = paths.find(|p| p.as_ref().unwrap().path().file_name().unwrap().to_string_lossy().starts_with("sled"));
+    // let kvs_exist = paths.find(|p| p.as_ref().unwrap().path().file_name().unwrap().to_string_lossy().starts_with("kvs"));
+    // println!("{:?}", kvs_exist);
+    // println!("{:?}", sled_exist);
+    // println!("{:?}", engine);
+    // Ok(())
 
-    let sled_exist = paths.find(|p| p.as_ref().unwrap().path().file_name().unwrap().to_string_lossy().starts_with("sled"));
-    let kvs_exist = paths.find(|p| p.as_ref().unwrap().path().file_name().unwrap().to_string_lossy().starts_with("kvs"));
-
-    if (opt.engine == "kvs".to_owned() && sled_exist.is_some()) || (opt.engine == "sled".to_owned() && kvs_exist.is_some()) {
-        return Err(KvsError::WrongEngineError { engine: opt.engine, });
-    }
-
-    if opt.engine == "kvs".to_owned() {
-        run(KvStore::open(current_dir()?)?, opt)
-    } else {
-        run(SledStore::open(current_dir()?)?, opt)
+    match engine {
+        Engine::Kvs => {
+            if sled_exist.is_some() {
+                return Err(KvsError::WrongEngineError);
+            } else {
+                run(KvStore::open(current_dir()?)?, opt)
+            }
+        }
+        Engine::Sled => {
+            if kvs_exist.is_some() {
+                return Err(KvsError::WrongEngineError);
+            } else {
+                run(SledStore::open(current_dir()?)?, opt)
+            }
+        }
     }
 }
 
@@ -48,8 +82,14 @@ fn run(mut store: impl KvsEngine, opt: ServerOpt) -> Result<()> {
 
     let listener = TcpListener::bind(&opt.addr)?;
 
+    let engine = if opt.engine.is_none() {
+        Engine::Kvs
+    } else {
+        opt.engine.unwrap()
+    };
+
     info!(logger, "initiate the database server"); 
-    info!(logger, "version: {} engine: {} address: {}", env!("CARGO_PKG_VERSION"), opt.engine, opt.addr);
+    info!(logger, "version: {} engine: {} address: {}", env!("CARGO_PKG_VERSION"), engine, opt.addr);
 
     for stream in listener.incoming() {
         match stream {

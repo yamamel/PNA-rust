@@ -1,7 +1,7 @@
 use sled;
 use crate::KvsEngine;
 use std::path::PathBuf;
-use crate::Result;
+use crate::{KvsError, Result};
 
 pub struct SledStore {
     sled: sled::Db,
@@ -10,7 +10,7 @@ pub struct SledStore {
 impl SledStore {
     pub fn open(path: impl Into<PathBuf>) -> Result<SledStore> {
         let mut path: PathBuf = path.into();
-        path.push("seld-data");
+        path.push("sled-data");
         Ok(SledStore {
             sled: sled::open(path)?,
         })
@@ -20,6 +20,7 @@ impl SledStore {
 impl KvsEngine for SledStore {
     fn set(&mut self, key: String, value: String) -> Result<()> {
         self.sled.insert(key.as_bytes(), value.as_bytes())?;
+        self.sled.flush()?;
         Ok(())
     }
 
@@ -29,7 +30,12 @@ impl KvsEngine for SledStore {
     }
 
     fn remove(&mut self, key: String) -> Result<()> {
-        self.sled.remove(key.as_bytes())?;
-        Ok(())
+        let v = self.sled.remove(key.as_bytes())?;
+        if v == None {
+            Err(KvsError::KeyNotFoundError)
+        } else {
+            self.sled.flush()?;
+            Ok(())
+        }
     }
 }

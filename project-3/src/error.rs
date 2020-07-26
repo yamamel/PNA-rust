@@ -14,8 +14,8 @@ pub enum KvsError {
     /// caused by key not found
     #[fail(display = "Key not found")]
     KeyNotFoundError,
-    #[fail(display = "Unknown database engine: {}", engine)]
-    WrongEngineError { engine: String, },
+    #[fail(display = "Wrong database engine")]
+    WrongEngineError,
     #[fail(display = "{}", _0)]
     SledError(#[cause] sled::Error)
 }
