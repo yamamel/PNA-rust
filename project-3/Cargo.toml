@@ -15,12 +15,14 @@ predicates = "1.0.4"
 tempfile = "3.0.7"
 walkdir = "2.2.7"
 clap = "2.33.1"
+structopt = "0.3.15"
 failure = "0.1.8"
 failure_derive = "0.1.8"
 serde = { version = "1.0.114", features = ["derive"] }
 serde_json = "1.0"
 sloggers = "1.0.1"
 slog = "2.5.2"
+sled = "0.34.0"
 
 [[bin]]
 name = "kvs-server"

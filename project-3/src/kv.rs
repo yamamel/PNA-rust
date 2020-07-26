@@ -1,4 +1,5 @@
 use crate::{KvsError, Result};
+use crate::KvsEngine;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
@@ -7,10 +8,11 @@ use std::io::Write;
 use std::io::{BufReader, Read};
 use std::io::{Seek, SeekFrom};
 use std::path::PathBuf;
+use structopt::StructOpt;
 
 const MAX_UNCOMPACTED_SIZE: u64 = 1024 * 1024;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, StructOpt)]
 pub enum Command {
     Set { key: String, value: String },
     Rm { key: String },
@@ -40,71 +42,7 @@ impl KvStore {
         }
     }
 
-    /// This method used to set a new key-value pair,
-    /// It can also be used to update the value of a key
-    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
-    pub fn set(&mut self, key: String, value: String) -> Result<()> {
-        let key_clone = key.clone();
-        self.command = Some(Command::Set { key, value });
-        let j = serde_json::to_string(&self.command)?;
-        let len = (j.len() + "\n".len()) as u64;
-        self.map
-            .insert(key_clone, LogInFile::new(self.position, len));
-        self.position += len;
-        let mut f = self.buffer.get_ref();
-        serde_json::to_writer(f, &self.command)?;
-        // Question: using `%` to separate commands can not pass the get_stored_key test
-        f.write(b"\n")?;
-        self.uncompacted_size += len;
-        if self.uncompacted_size > MAX_UNCOMPACTED_SIZE {
-            self.compact()?;
-        }
-        Ok(())
-    }
-
-    /// This method used to get a value of the key in the Option.
-    /// Key not been set will return `Ok(None)`
-    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
-    pub fn get(&mut self, key: String) -> Result<Option<String>> {
-        match self.map.get(&key) {
-            None => Ok(None),
-            Some(log) => {
-                let reader = self.buffer.get_mut();
-                reader.seek(SeekFrom::Start(log.offset))?;
-                let cmd = reader.take(log.length);
-                if let Command::Set { value, .. } = serde_json::from_reader(cmd)? {
-                    Ok(Some(value))
-                } else {
-                    Ok(None)
-                }
-            }
-        }
-    }
-
-    /// This method used to remove a key-value pair
-    /// if the given key is not exist, a `KvsError::KeyNotFoundError` will be returned
-    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
-    pub fn remove(&mut self, key: String) -> Result<()> {
-        match self.map.get(&key) {
-            None => return Err(KvsError::KeyNotFoundError),
-            Some(_) => {
-                self.map.remove(&key);
-                self.command = Some(Command::Rm { key });
-                let j = serde_json::to_string(&self.command)?;
-                let len = (j.len() + "\n".len()) as u64;
-                self.position += len;
-                self.uncompacted_size += len;
-                let mut f = self.buffer.get_ref();
-                serde_json::to_writer(f, &self.command)?;
-                f.write(b"\n")?;
-                if self.uncompacted_size > MAX_UNCOMPACTED_SIZE {
-                    self.compact()?;
-                }
-            }
-        }
-        Ok(())
-    }
-
+    
     /// This method is used to create a KvStore
     /// It will read the "kvs-data.json" file in the path
     /// initiate the key-log record in the memory.
@@ -171,6 +109,73 @@ impl KvStore {
         fs::rename(path_from, path_to)?;
         self.uncompacted_size = 0;
         self.position = f.seek(SeekFrom::End(0))?;
+        Ok(())
+    }
+}
+
+impl KvsEngine for KvStore {
+    /// This method used to set a new key-value pair,
+    /// It can also be used to update the value of a key
+    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
+    fn set(&mut self, key: String, value: String) -> Result<()> {
+        let key_clone = key.clone();
+        self.command = Some(Command::Set { key, value });
+        let j = serde_json::to_string(&self.command)?;
+        let len = (j.len() + "\n".len()) as u64;
+        self.map
+            .insert(key_clone, LogInFile::new(self.position, len));
+        self.position += len;
+        let mut f = self.buffer.get_ref();
+        serde_json::to_writer(f, &self.command)?;
+        // Question: using `%` to separate commands can not pass the get_stored_key test
+        f.write(b"\n")?;
+        self.uncompacted_size += len;
+        if self.uncompacted_size > MAX_UNCOMPACTED_SIZE {
+            self.compact()?;
+        }
+        Ok(())
+    }
+
+    /// This method used to get a value of the key in the Option.
+    /// Key not been set will return `Ok(None)`
+    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
+    fn get(&mut self, key: String) -> Result<Option<String>> {
+        match self.map.get(&key) {
+            None => Ok(None),
+            Some(log) => {
+                let reader = self.buffer.get_mut();
+                reader.seek(SeekFrom::Start(log.offset))?;
+                let cmd = reader.take(log.length);
+                if let Command::Set { value, .. } = serde_json::from_reader(cmd)? {
+                    Ok(Some(value))
+                } else {
+                    Ok(None)
+                }
+            }
+        }
+    }
+
+    /// This method used to remove a key-value pair
+    /// if the given key is not exist, a `KvsError::KeyNotFoundError` will be returned
+    /// An `KvsError::IoError` or `KvsError::SerdeError` may return
+    fn remove(&mut self, key: String) -> Result<()> {
+        match self.map.get(&key) {
+            None => return Err(KvsError::KeyNotFoundError),
+            Some(_) => {
+                self.map.remove(&key);
+                self.command = Some(Command::Rm { key });
+                let j = serde_json::to_string(&self.command)?;
+                let len = (j.len() + "\n".len()) as u64;
+                self.position += len;
+                self.uncompacted_size += len;
+                let mut f = self.buffer.get_ref();
+                serde_json::to_writer(f, &self.command)?;
+                f.write(b"\n")?;
+                if self.uncompacted_size > MAX_UNCOMPACTED_SIZE {
+                    self.compact()?;
+                }
+            }
+        }
         Ok(())
     }
 }

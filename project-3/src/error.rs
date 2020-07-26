@@ -1,5 +1,6 @@
 // use failure;
 use failure_derive::Fail;
+use sled;
 
 /// Error type for kvs
 #[derive(Debug, Fail)]
@@ -13,6 +14,10 @@ pub enum KvsError {
     /// caused by key not found
     #[fail(display = "Key not found")]
     KeyNotFoundError,
+    #[fail(display = "Unknown database engine: {}", engine)]
+    WrongEngineError { engine: String, },
+    #[fail(display = "{}", _0)]
+    SledError(#[cause] sled::Error)
 }
 
 impl From<std::io::Error> for KvsError {
@@ -26,5 +31,12 @@ impl From<serde_json::error::Error> for KvsError {
         KvsError::SerdeError(inner)
     }
 }
+
+impl From<sled::Error> for KvsError {
+    fn from(inner: sled::Error) -> KvsError {
+        KvsError::SledError(inner)
+    }
+}
+
 /// Result type for kvs
 pub type Result<T> = std::result::Result<T, KvsError>;
