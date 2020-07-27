@@ -49,13 +49,6 @@ fn main() -> Result<()> {
         }
     }
 
-    // let sled_exist = paths.find(|p| p.as_ref().unwrap().path().file_name().unwrap().to_string_lossy().starts_with("sled"));
-    // let kvs_exist = paths.find(|p| p.as_ref().unwrap().path().file_name().unwrap().to_string_lossy().starts_with("kvs"));
-    // println!("{:?}", kvs_exist);
-    // println!("{:?}", sled_exist);
-    // println!("{:?}", engine);
-    // Ok(())
-
     match engine {
         Engine::Kvs => {
             if sled_exist.is_some() {

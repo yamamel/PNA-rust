@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
 use std::fs::{self, OpenOptions};
-use std::io::Write;
+use std::io::{BufWriter, Write};
 use std::io::{BufReader, Read};
 use std::io::{Seek, SeekFrom};
 use std::path::PathBuf;
@@ -89,26 +89,28 @@ impl KvStore {
         let mut path_to = self.path.clone();
         path_from.push("kvs-data-compact.json");
         path_to.push("kvs-data.json");
-        let mut f = OpenOptions::new()
+        let f = OpenOptions::new()
             .write(true)
             .append(true)
             .create(true)
             .open(&path_from)?;
         let reader = self.buffer.get_mut();
+        let new_reader = BufReader::new(f.try_clone()?);
+        let mut writer = BufWriter::new(f);
         let mut new_offset: u64 = 0;
         for (_key, LogInFile { offset, length }) in self.map.iter_mut() {
             reader.seek(SeekFrom::Start(*offset))?;
             let mut cmd = reader.take(*length);
-            std::io::copy(&mut cmd, &mut f)?;
+            std::io::copy(&mut cmd, &mut writer)?;
             *offset = new_offset;
-            // Question: I still don't know why the compact test will add the split of mine twice.
-            // f.write(b"\n")?;
-            // new_offset += *length + "\n".len() as u64;
+            new_offset += *length + "\n".len() as u64;
             new_offset += *length;
         }
+        // rename 后原先的 path_to 对应的 bufreader 流就被关闭了，因此需要重新开一个
         fs::rename(path_from, path_to)?;
         self.uncompacted_size = 0;
-        self.position = f.seek(SeekFrom::End(0))?;
+        self.position = writer.seek(SeekFrom::End(0))?;
+        self.buffer = new_reader;
         Ok(())
     }
 }
