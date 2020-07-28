@@ -1,7 +1,6 @@
-use sled;
 use crate::KvsEngine;
-use std::path::PathBuf;
 use crate::{KvsError, Result};
+use std::path::PathBuf;
 
 pub struct SledStore {
     sled: sled::Db,

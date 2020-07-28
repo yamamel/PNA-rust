@@ -1,14 +1,14 @@
 use clap::arg_enum;
-use structopt::StructOpt;
-use slog::info;
-use sloggers::Build;
-use sloggers::terminal::{TerminalLoggerBuilder, Destination};
-use sloggers::types::Severity;
-use kvs::{KvsError, Result, Command, KvStore, KvsEngine};
-use std::net::TcpListener;
-use std::io::{Read, Write, BufReader, BufWriter};  
-use std::env::current_dir;
 use kvs::SledStore;
+use kvs::{Command, KvStore, KvsEngine, KvsError, Result};
+use slog::info;
+use sloggers::terminal::{Destination, TerminalLoggerBuilder};
+use sloggers::types::Severity;
+use sloggers::Build;
+use std::env::current_dir;
+use std::io::{BufReader, BufWriter, Read, Write};
+use std::net::TcpListener;
+use structopt::StructOpt;
 
 arg_enum! {
     #[derive(Debug, Clone)]
@@ -39,7 +39,13 @@ fn main() -> Result<()> {
     let mut kvs_exist: Option<String> = None;
 
     for entry in paths {
-        let file_name = entry.unwrap().path().file_name().unwrap().to_string_lossy().into_owned();
+        let file_name = entry
+            .unwrap()
+            .path()
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .into_owned();
         if file_name.starts_with("kvs") {
             kvs_exist = Some(file_name);
             break;
@@ -81,8 +87,14 @@ fn run(mut store: impl KvsEngine, opt: ServerOpt) -> Result<()> {
         opt.engine.unwrap()
     };
 
-    info!(logger, "initiate the database server"); 
-    info!(logger, "version: {} engine: {} address: {}", env!("CARGO_PKG_VERSION"), engine, opt.addr);
+    info!(logger, "initiate the database server");
+    info!(
+        logger,
+        "version: {} engine: {} address: {}",
+        env!("CARGO_PKG_VERSION"),
+        engine,
+        opt.addr
+    );
 
     for stream in listener.incoming() {
         match stream {
@@ -94,7 +106,8 @@ fn run(mut store: impl KvsEngine, opt: ServerOpt) -> Result<()> {
                 let mut buf = [0; 512];
                 let byte_num = reader.read(&mut buf)?;
                 // println!("{}", byte_num);
-                let request = String::from_utf8((&buf[0..byte_num]).to_vec()).expect("Found invalid utf-8");
+                let request =
+                    String::from_utf8((&buf[0..byte_num]).to_vec()).expect("Found invalid utf-8");
                 // println!("{}", request);
                 let cmd = serde_json::from_str(&request)?;
                 match cmd {
@@ -103,32 +116,23 @@ fn run(mut store: impl KvsEngine, opt: ServerOpt) -> Result<()> {
                     }
                     Command::Get { key } => {
                         let response = match store.get(key.to_owned())? {
-                            None => {
-                                "Key not found".to_owned()
-                            }
-                            Some(value) => {
-                                value
-                            }
+                            None => "Key not found".to_owned(),
+                            Some(value) => value,
                         };
                         writer.write(response.as_bytes())?;
                         writer.flush()?;
                     }
-                    Command::Rm { key } => {
-                        match store.remove(key.to_owned()) {
-                            Ok(()) => (),
-                            Err(KvsError::KeyNotFoundError) => {
-                                writer.write("Key not found".as_bytes())?;
-                                writer.flush()?;
-                            }
-                            Err(e) => return Err(e),
+                    Command::Rm { key } => match store.remove(key.to_owned()) {
+                        Ok(()) => (),
+                        Err(KvsError::KeyNotFoundError) => {
+                            writer.write("Key not found".as_bytes())?;
+                            writer.flush()?;
                         }
-                    }
+                        Err(e) => return Err(e),
+                    },
                 }
-
             }
-            Err(_) => {
-
-            }
+            Err(_) => {}
         }
     }
     Ok(())

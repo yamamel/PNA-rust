@@ -1,6 +1,5 @@
 // use failure;
 use failure_derive::Fail;
-use sled;
 
 /// Error type for kvs
 #[derive(Debug, Fail)]
@@ -17,7 +16,7 @@ pub enum KvsError {
     #[fail(display = "Wrong database engine")]
     WrongEngineError,
     #[fail(display = "{}", _0)]
-    SledError(#[cause] sled::Error)
+    SledError(#[cause] sled::Error),
 }
 
 impl From<std::io::Error> for KvsError {

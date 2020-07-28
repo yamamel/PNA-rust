@@ -1,11 +1,10 @@
-use crate::{KvsError, Result};
 use crate::KvsEngine;
+use crate::{KvsError, Result};
 use serde::{Deserialize, Serialize};
-use serde_json;
 use std::collections::HashMap;
 use std::fs::{self, OpenOptions};
-use std::io::{BufWriter, Write};
 use std::io::{BufReader, Read};
+use std::io::{BufWriter, Write};
 use std::io::{Seek, SeekFrom};
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -42,7 +41,6 @@ impl KvStore {
         }
     }
 
-    
     /// This method is used to create a KvStore
     /// It will read the "kvs-data.json" file in the path
     /// initiate the key-log record in the memory.
@@ -60,8 +58,8 @@ impl KvStore {
         let mut str_buffer = String::new();
         let mut kvstore = KvStore::new(buffer, path_clone);
         kvstore.buffer.read_to_string(&mut str_buffer)?;
-        for s in str_buffer.split("\n").collect::<Vec<&str>>() {
-            if s.len() == 0 {
+        for s in str_buffer.split('\n').collect::<Vec<&str>>() {
+            if s.is_empty() {
                 continue;
             }
             let len = s.len() as u64;
@@ -200,4 +198,4 @@ impl LogInFile {
 // cause keys may not in the same log file.
 
 // As same as the `compact` function as mine, he just scans the index-[log pos] map
-// and copy the exist log to a new file (Though the file name is 1+largest index of log file now). 
+// and copy the exist log to a new file (Though the file name is 1+largest index of log file now).
